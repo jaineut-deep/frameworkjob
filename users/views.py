@@ -1,6 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from users.permissions import IsUserSelf
 from rest_framework.filters import OrderingFilter
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+
 from users.models import Payment, CustomUser
 from users.serializers import PaymentSerializer, CustomUserSerializer
 
@@ -25,12 +28,15 @@ class CustomUserCreateAPIView(generics.CreateAPIView):
 class CustomUserRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
+    permission_classes = [IsAuthenticated]
 
 
 class CustomUserUpdateAPIView(generics.UpdateAPIView):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
+    permission_classes = [IsAuthenticated, IsUserSelf]
 
 
 class CustomUserDestroyAPIView(generics.DestroyAPIView):
     queryset = CustomUser.objects.all()
+    permission_classes = [IsAuthenticated, IsUserSelf]
