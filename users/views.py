@@ -19,6 +19,7 @@ class PaymentListAPIView(generics.ListAPIView):
 class CustomUserListAPIView(generics.ListCreateAPIView):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
+    permission_classes = [IsAuthenticated]
 
 
 class CustomUserCreateAPIView(generics.CreateAPIView):
