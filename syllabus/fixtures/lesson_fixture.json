@@ -7,7 +7,8 @@
         "description": "Типы данных. Переменные. Функция",
         "image": "",
         "link": null,
-        "course": 3
+        "course": 3,
+        "owner": 4
     }
 },
 {
@@ -18,7 +19,8 @@
         "description": "Настройка БД. Работа с таблицами. Работа в приложении",
         "image": "",
         "link": null,
-        "course": 3
+        "course": 3,
+        "owner": 4
     }
 },
 {
@@ -29,7 +31,8 @@
         "description": "Работа с шаблонами. Django ORM, модели и БД",
         "image": "",
         "link": null,
-        "course": 3
+        "course": 3,
+        "owner": 4
     }
 },
 {
@@ -40,7 +43,8 @@
         "description": "Qt language. Контейнеры и QString. Механизм сигналов и слотов",
         "image": "",
         "link": null,
-        "course": 4
+        "course": 4,
+        "owner": 4
     }
 },
 {
@@ -51,7 +55,8 @@
         "description": "Методы оптимизации кода. Профилирование и анализ производительности",
         "image": "",
         "link": null,
-        "course": 4
+        "course": 4,
+        "owner": 4
     }
 },
 {
@@ -62,7 +67,8 @@
         "description": "Clang Static Analyzer. Тестирования",
         "image": "",
         "link": null,
-        "course": 4
+        "course": 4,
+        "owner": 4
     }
 },
 {
@@ -73,7 +79,8 @@
         "description": "Что такое Java. Установка JDK. JShell",
         "image": "",
         "link": null,
-        "course": 5
+        "course": 5,
+        "owner": 5
     }
 },
 {
@@ -84,7 +91,8 @@
         "description": "Структура программы. Преобразования базовых типов данных",
         "image": "",
         "link": null,
-        "course": 5
+        "course": 5,
+        "owner": 5
     }
 },
 {
@@ -95,7 +103,8 @@
         "description": "Maven. REST и Spring Boot. Внедрение зависимостей. Введение в базы данных",
         "image": "",
         "link": null,
-        "course": 5
+        "course": 5,
+        "owner": 5
     }
 }
 ]

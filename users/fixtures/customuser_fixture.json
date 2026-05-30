@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$1200000$DzxXeJQ7OexoE8Kdny53FB$8/VR+o7BCyO4mNQCke0IKSpwQgHYW/XFQIlJc7R13KE=",
-        "last_login": null,
+        "last_login": "2026-05-29T07:34:53.027Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -27,17 +27,19 @@
         "password": "pbkdf2_sha256$1200000$kxqIidsTtG5eFx6rcDvZt4$8nae0IPgDUe/R0A0sHSEfk07u5X6bKPYvbpwabGHANw=",
         "last_login": null,
         "is_superuser": false,
-        "username": "",
+        "username": "First",
         "first_name": "",
         "last_name": "",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2026-05-27T12:57:50.293Z",
+        "date_joined": "2026-05-27T12:57:50Z",
         "email": "one@example.com",
         "phone_number": null,
         "city": null,
         "avatar": "",
-        "groups": [],
+        "groups": [
+            1
+        ],
         "user_permissions": []
     }
 },

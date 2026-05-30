@@ -1,0 +1,32 @@
+[
+{
+    "model": "syllabus.course",
+    "pk": 3,
+    "fields": {
+        "title": "Python-разработчик",
+        "image": "",
+        "description": "Почувствуете себя бэкенд-разработчиком на Python",
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.course",
+    "pk": 4,
+    "fields": {
+        "title": "Разработчик C++",
+        "image": "",
+        "description": "Познакомитесь с языком C++ и напишете простые программы",
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.course",
+    "pk": 5,
+    "fields": {
+        "title": "Java-разработчик",
+        "image": "",
+        "description": "Познакомитесь с языком Java и разберёте его базовые конструкции",
+        "owner": 5
+    }
+}
+]

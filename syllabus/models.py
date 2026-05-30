@@ -5,6 +5,8 @@ class Course(models.Model):
     title = models.CharField(max_length=30, verbose_name="Название")
     image = models.ImageField(upload_to="images/courses/", verbose_name="Превью", blank=True, null=True)
     description = models.TextField(verbose_name="Описание")
+    owner = models.ForeignKey(to="users.CustomUser", on_delete=models.CASCADE, related_name="courses",
+                              verbose_name="Владелец")
 
     def __str__(self):
         return self.title
@@ -20,6 +22,8 @@ class Lesson(models.Model):
     image = models.ImageField(upload_to="images/lessons/", verbose_name="Превью", blank=True, null=True)
     link = models.URLField(verbose_name="Ссылка_на_видео", blank=True, null=True)
     course = models.ForeignKey(to=Course, on_delete=models.CASCADE, related_name="lessons", verbose_name="Курс")
+    owner = models.ForeignKey(to="users.CustomUser", on_delete=models.CASCADE, related_name="lessons",
+                              verbose_name="Владелец")
 
     def __str__(self):
         return f"{self.title} - {self.course}"
