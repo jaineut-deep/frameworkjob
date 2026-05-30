@@ -7,16 +7,13 @@ class IsUserSelf(BasePermission):
         return request.user == obj
 
 
-class IsModerator(BasePermission):
+class IsNotModerator(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.groups.filter(name="Moderators").exists()
+        return not request.user.groups.filter(name="Moderators").exists()
 
 
-class IsOwnerOrReadOnly(BasePermission):
+class IsOwner(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if obj.owner == request.user:
-            return True
-
-        return request.method in ("GET", "HEAD", "OPTIONS")
+        return obj.owner == request.user
