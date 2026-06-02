@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from syllabus.models import Course, Lesson
+from syllabus.validators import LinkValidator
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -8,6 +9,7 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = "__all__"
         read_only_fields = ["owner"]
+        validators = [LinkValidator(field="link")]
 
 
 class CourseSerializer(serializers.ModelSerializer):
