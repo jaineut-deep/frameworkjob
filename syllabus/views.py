@@ -1,9 +1,11 @@
 from rest_framework.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 from syllabus.serializers import CourseSerializer, LessonSerializer
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from syllabus.models import Course, Lesson
+from rest_framework.views import APIView
+from syllabus.models import Course, Lesson, Subscription
 from users.permissions import IsNotModerator, IsOwner
 
 
@@ -119,3 +121,28 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated, IsNotModerator, IsOwner]
+
+
+class SubscriptionView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get("course_id")
+
+        if not course_id:
+            return Response(
+                {"error": "course_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        course_item = get_object_or_404(Course, id=course_id)
+        subs_item = Subscription.objects.filter(user=user, course=course_item)
+
+        if subs_item.exists():
+            subs_item.delete()
+            message = "подписка удалена"
+        else:
+            Subscription.objects.create(user=user, course=course_item)
+            message = "подписка добавлена"
+
+        return Response({"message": message})
