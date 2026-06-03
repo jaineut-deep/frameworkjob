@@ -1,5 +1,6 @@
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from syllabus.paginators import CourseLessonPaginator
 from syllabus.serializers import CourseSerializer, LessonSerializer
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -12,6 +13,7 @@ from users.permissions import IsNotModerator, IsOwner
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    pagination_class = CourseLessonPaginator
 
     def get_permissions(self):
         if self.action == "list":
@@ -66,6 +68,7 @@ class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated]
+    pagination_class = CourseLessonPaginator
 
     def list(self, request, *args, **kwargs):
         if request.user.groups.filter(name="Moderators").exists():
@@ -125,7 +128,7 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
 class SubscriptionView(APIView):
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         user = request.user
         course_id = request.data.get("course_id")
 
