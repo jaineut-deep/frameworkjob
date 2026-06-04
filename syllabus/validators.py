@@ -10,5 +10,5 @@ class LinkValidator:
     def __call__(self, value):
         regular = re.compile(r'https://www.youtube.com')
         tmp_val = dict(value).get(self.field)
-        if not bool(re.search(regular, tmp_val, flags=re.IGNORECASE)):
+        if (tmp_val is not None) and not bool(re.search(regular, tmp_val)):
             raise ValidationError("Link is not acceptable")
