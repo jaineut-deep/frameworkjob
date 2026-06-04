@@ -66,7 +66,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
-    queryset = Lesson.objects.all()
+    queryset = Lesson.objects.all().order_by("id")
     permission_classes = [IsAuthenticated]
     pagination_class = CourseLessonPaginator
 
@@ -77,8 +77,8 @@ class LessonListAPIView(generics.ListAPIView):
             queryset = self.get_queryset().filter(owner=self.request.user)
         else:
             raise PermissionDenied("Недостаточно прав для отображения объектов.")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        self.queryset = queryset
+        return super().list(request, *args, **kwargs)
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
