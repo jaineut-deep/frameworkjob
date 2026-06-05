@@ -1,15 +1,19 @@
 from rest_framework.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from syllabus.paginators import CourseLessonPaginator
 from syllabus.serializers import CourseSerializer, LessonSerializer
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from syllabus.models import Course, Lesson
+from rest_framework.views import APIView
+from syllabus.models import Course, Lesson, Subscription
 from users.permissions import IsNotModerator, IsOwner
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    pagination_class = CourseLessonPaginator
 
     def get_permissions(self):
         if self.action == "list":
@@ -62,8 +66,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
-    queryset = Lesson.objects.all()
+    queryset = Lesson.objects.all().order_by("id")
     permission_classes = [IsAuthenticated]
+    pagination_class = CourseLessonPaginator
 
     def list(self, request, *args, **kwargs):
         if request.user.groups.filter(name="Moderators").exists():
@@ -72,8 +77,8 @@ class LessonListAPIView(generics.ListAPIView):
             queryset = self.get_queryset().filter(owner=self.request.user)
         else:
             raise PermissionDenied("Недостаточно прав для отображения объектов.")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        self.queryset = queryset
+        return super().list(request, *args, **kwargs)
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
@@ -119,3 +124,28 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated, IsNotModerator, IsOwner]
+
+
+class SubscriptionView(APIView):
+
+    def post(self, request):
+        user = request.user
+        course_id = request.data.get("course_id")
+
+        if not course_id:
+            return Response(
+                {"error": "course_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        course_item = get_object_or_404(Course, id=course_id)
+        subs_item = Subscription.objects.filter(user=user, course=course_item)
+
+        if subs_item.exists():
+            subs_item.delete()
+            message = "подписка удалена"
+        else:
+            Subscription.objects.create(user=user, course=course_item)
+            message = "подписка добавлена"
+
+        return Response({"message": message})

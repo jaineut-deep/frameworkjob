@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+
 class Course(models.Model):
     title = models.CharField(max_length=30, verbose_name="Название")
     image = models.ImageField(upload_to="images/courses/", verbose_name="Превью", blank=True, null=True)
@@ -31,3 +31,18 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = "урок"
         verbose_name_plural = "уроки"
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(to="users.CustomUser", on_delete=models.CASCADE, related_name="subscriptions",
+                              verbose_name="Пользователь")
+    course = models.ForeignKey(to=Course, on_delete=models.CASCADE, related_name="subscriptions", verbose_name="Курс")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата_создания")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.course.title}"
+
+    class Meta:
+        verbose_name = "подписка"
+        verbose_name_plural = "подписки"
+        unique_together = ("user", "course")
