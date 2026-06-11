@@ -3,7 +3,7 @@ from users.permissions import IsUserSelf
 from rest_framework.filters import OrderingFilter
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-
+# from syllabus.services import get_prod_id, get_price_id, get_session
 from users.models import Payment, CustomUser
 from users.serializers import PaymentSerializer, CustomUserSerializer
 
@@ -14,6 +14,17 @@ class PaymentListAPIView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["course", "lesson", "payment_method",]
     ordering_fields = ["payment_date"]
+
+
+class PaymentCreateAPIView(generics.CreateAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class PaymentRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+    permission_classes = [IsAuthenticated]
 
 
 class CustomUserListAPIView(generics.ListCreateAPIView):
