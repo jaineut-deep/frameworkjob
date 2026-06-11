@@ -3,7 +3,6 @@ from users.permissions import IsUserSelf
 from rest_framework.filters import OrderingFilter
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-# from syllabus.services import get_prod_id, get_price_id, get_session
 from users.models import Payment, CustomUser
 from users.serializers import PaymentSerializer, CustomUserSerializer
 
