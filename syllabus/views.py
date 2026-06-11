@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from syllabus.paginators import CourseLessonPaginator
@@ -9,7 +10,23 @@ from rest_framework.views import APIView
 from syllabus.models import Course, Lesson, Subscription
 from users.permissions import IsNotModerator, IsOwner
 
-
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список курсов",
+        ),
+    update=extend_schema(
+        summary="Изменение существующего объекта курса",
+    ),
+    partial_update=extend_schema(
+        summary="Частичное изменение данных о курсе",
+    ),
+    create=extend_schema(
+        summary="Создание нового курса",
+        ),
+    destroy=extend_schema(
+        summary="Удаление существующего курса",
+        ),
+)
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
@@ -70,6 +87,7 @@ class LessonListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     pagination_class = CourseLessonPaginator
 
+    @extend_schema(summary="Метод для отображения списка уроков")
     def list(self, request, *args, **kwargs):
         if request.user.groups.filter(name="Moderators").exists():
             queryset = self.get_queryset()
@@ -85,6 +103,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsNotModerator]
 
+    @extend_schema(summary="Метод для создания нового объекта урока")
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -94,6 +113,7 @@ class LessonRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(summary="Метод для получения отдельного объекта урока")
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         if request.user.groups.filter(name="Moderators").exists():
@@ -110,6 +130,7 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(summary="Метод устанавливающий порядок редактирования урока: для Пользователя или Модератора")
     def perform_update(self, serializer):
         request = self.request
         if request.user.groups.filter(name="Moderators").exists():
@@ -128,6 +149,7 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
 class SubscriptionView(APIView):
 
+    @extend_schema(summary="Метод для изменения статуса подписки пользователя")
     def post(self, request):
         user = request.user
         course_id = request.data.get("course_id")

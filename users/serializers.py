@@ -1,8 +1,21 @@
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_framework import serializers
 from syllabus.services import get_prod_id, get_price_id, get_session
 from users.models import Payment, CustomUser
 
 
+@extend_schema_serializer(
+    examples = [
+         OpenApiExample(
+            'Valid example 1',
+            summary='short summary',
+            description='longer description',
+            value={
+                "course": 3
+            },
+        ),
+    ]
+)
 class PaymentSerializer(serializers.ModelSerializer):
     product_id = serializers.CharField(max_length=100, required=False)
     price_id = serializers.CharField(max_length=100, required=False)
