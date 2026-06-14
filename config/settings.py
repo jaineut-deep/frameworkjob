@@ -41,11 +41,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
+
     "syllabus",
     "users",
+
     "django_filters",
+    "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
+    "corsheaders",
 
 ]
 
@@ -57,6 +61,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -148,9 +154,27 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API Documentation',
+    'DESCRIPTION': 'Description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "https://read-only.example.com",
+    "https://read-and-write.example.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://read-and-write.example.com",
+]

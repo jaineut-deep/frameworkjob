@@ -22,6 +22,8 @@ class Payment(models.Model):
     lesson = models.ForeignKey(to="syllabus.Lesson", on_delete=models.SET_NULL, null=True, related_name="payments", verbose_name="Оплаченый_урок")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма_оплаты")
     payment_method = models.BooleanField(default=True, verbose_name="Способ_оплаты")
+    payment_url = models.URLField(max_length=850, verbose_name="Ссылка_на_оплату", null=True, blank=True)
+    payment_status = models.CharField(max_length=25, verbose_name="Статус_оплаты", null=True, blank=True)
 
     def __str__(self):
         return f"{self.user} - {self.course if self.course else self.lesson} - {self.payment_date}"

@@ -1,9 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from users.permissions import IsUserSelf
 from rest_framework.filters import OrderingFilter
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-
 from users.models import Payment, CustomUser
 from users.serializers import PaymentSerializer, CustomUserSerializer
 
@@ -16,6 +16,17 @@ class PaymentListAPIView(generics.ListAPIView):
     ordering_fields = ["payment_date"]
 
 
+class PaymentCreateAPIView(generics.CreateAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class PaymentRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+    permission_classes = [IsAuthenticated]
+
+
 class CustomUserListAPIView(generics.ListCreateAPIView):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
@@ -26,6 +37,7 @@ class CustomUserCreateAPIView(generics.CreateAPIView):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
 
+    @extend_schema(description="Метод для создания учетной записи для пользователя")
     def perform_create(self, serializer):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
