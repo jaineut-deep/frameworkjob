@@ -8,6 +8,7 @@ class Course(models.Model):
     owner = models.ForeignKey(to="users.CustomUser", on_delete=models.CASCADE, related_name="courses",
                               verbose_name="Владелец")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена", blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Последнее_обновление")
 
     def __str__(self):
         return self.title
@@ -25,6 +26,7 @@ class Lesson(models.Model):
     course = models.ForeignKey(to=Course, on_delete=models.CASCADE, related_name="lessons", verbose_name="Курс")
     owner = models.ForeignKey(to="users.CustomUser", on_delete=models.CASCADE, related_name="lessons",
                               verbose_name="Владелец")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Последнее_обновление")
 
     def __str__(self):
         return f"{self.title} - {self.course}"
