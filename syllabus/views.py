@@ -1,5 +1,4 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -77,7 +76,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         instance = serializer.instance
-        differ_time = datetime.now(ZoneInfo("Europe/Moscow")) - instance.updated_at
+        differ_time = timezone.now() - instance.updated_at
         differ_time_hours = round((differ_time.total_seconds() / 3600), 2)
         request = self.request
         if request.user.groups.filter(name="Moderators").exists():
@@ -143,7 +142,7 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
     @extend_schema(summary="Метод устанавливающий порядок редактирования урока: для Пользователя или Модератора")
     def perform_update(self, serializer):
         instance = serializer.instance
-        differ_time = datetime.now(ZoneInfo("Europe/Moscow")) - instance.updated_at
+        differ_time = timezone.now() - instance.updated_at
         differ_time_hours = round((differ_time.total_seconds() / 3600), 2)
         request = self.request
         if request.user.groups.filter(name="Moderators").exists():
