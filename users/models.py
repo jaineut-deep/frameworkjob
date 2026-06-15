@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     city = models.CharField(max_length=35, blank=True, null=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+    last_login = models.DateTimeField(auto_now=True, verbose_name="Последняя_авторизация")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
