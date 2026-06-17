@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$1200000$DzxXeJQ7OexoE8Kdny53FB$8/VR+o7BCyO4mNQCke0IKSpwQgHYW/XFQIlJc7R13KE=",
-        "last_login": "2026-05-29T07:34:53.027Z",
+        "last_login": "2026-06-14T20:59:15.976Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -25,7 +25,7 @@
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$1200000$kxqIidsTtG5eFx6rcDvZt4$8nae0IPgDUe/R0A0sHSEfk07u5X6bKPYvbpwabGHANw=",
-        "last_login": null,
+        "last_login": "2026-06-14T20:59:15.976Z",
         "is_superuser": false,
         "username": "First",
         "first_name": "",
@@ -48,7 +48,7 @@
     "pk": 4,
     "fields": {
         "password": "pbkdf2_sha256$1200000$bNvmvsLrRE3Y5RftvUN3XA$0j2ZlPo3eeWZ8S7j9u/CrmZR/A5aKZkwFDcoFe1pCS8=",
-        "last_login": null,
+        "last_login": "2026-05-01T20:59:15.976Z",
         "is_superuser": false,
         "username": "Second",
         "first_name": "",
@@ -69,7 +69,7 @@
     "pk": 5,
     "fields": {
         "password": "pbkdf2_sha256$1200000$AwdGvcR505sMBaHgd5veAQ$tVAQBnhYqMpW248ytCkq54JeKNOu/0tarvlfJ8gJdVw=",
-        "last_login": null,
+        "last_login": "2026-06-14T20:59:15.976Z",
         "is_superuser": false,
         "username": "Three",
         "first_name": "",
@@ -78,6 +78,27 @@
         "is_active": true,
         "date_joined": "2026-05-27T13:50:14.747Z",
         "email": "three@example.com",
+        "phone_number": null,
+        "city": null,
+        "avatar": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.customuser",
+    "pk": 6,
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$xmM2z8ZjGNFAxYAOwAvspe$y/LU3In0SplHCQYb6SjKVQicdDx9MbW30h8dirgUJ5I=",
+        "last_login": "2026-05-01T20:59:15.976Z",
+        "is_superuser": false,
+        "username": "Four",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-05-30T09:21:24.573Z",
+        "email": "four@example.com",
         "phone_number": null,
         "city": null,
         "avatar": "",

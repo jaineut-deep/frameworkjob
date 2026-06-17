@@ -1,3 +1,4 @@
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -8,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from syllabus.models import Course, Lesson, Subscription
+from syllabus.tasks import send_update_course_mail
 from users.permissions import IsNotModerator, IsOwner
 
 @extend_schema_view(
@@ -50,8 +52,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         if request.user.groups.filter(name="Moderators").exists():
             queryset = self.get_queryset()
-        elif not request.user.groups.filter(name="Moderators").exists():
+        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(owner=self.request.user):
             queryset = self.get_queryset().filter(owner=self.request.user)
+        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(subscriptions__user=self.request.user):
+            queryset = self.get_queryset().filter(subscriptions__user=self.request.user)
         else:
             raise PermissionDenied("Недостаточно прав для отображения объектов.")
         serializer = self.get_serializer(queryset, many=True)
@@ -71,12 +75,17 @@ class CourseViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def perform_update(self, serializer):
+        instance = serializer.instance
+        differ_time = timezone.now() - instance.updated_at
+        differ_time_hours = round((differ_time.total_seconds() / 3600), 2)
         request = self.request
         if request.user.groups.filter(name="Moderators").exists():
             serializer.save()
+            send_update_course_mail.delay(instance.id, "Course", differ_time_hours)
         elif (not request.user.groups.filter(name="Moderators").exists() and
             self.get_queryset().filter(owner=request.user)):
             serializer.save(owner=request.user)
+            send_update_course_mail.delay(instance.id, "Course", differ_time_hours)
         else:
             raise PermissionDenied("Недостаточно прав для обновления объекта.")
 
@@ -132,12 +141,17 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 
     @extend_schema(summary="Метод устанавливающий порядок редактирования урока: для Пользователя или Модератора")
     def perform_update(self, serializer):
+        instance = serializer.instance
+        differ_time = timezone.now() - instance.updated_at
+        differ_time_hours = round((differ_time.total_seconds() / 3600), 2)
         request = self.request
         if request.user.groups.filter(name="Moderators").exists():
             serializer.save()
+            send_update_course_mail.delay(instance.id, "Lesson", differ_time_hours)
         elif (not request.user.groups.filter(name="Moderators").exists() and
             self.get_queryset().filter(owner=request.user)):
             serializer.save(owner=request.user)
+            send_update_course_mail.delay(instance.id, "Lesson", differ_time_hours)
         else:
             raise PermissionDenied("Недостаточно прав для обновления объекта.")
 

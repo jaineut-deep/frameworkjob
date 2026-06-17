@@ -1,0 +1,11 @@
+[
+{
+    "model": "syllabus.subscription",
+    "pk": 8,
+    "fields": {
+        "user": 6,
+        "course": 3,
+        "created_at": "2026-06-15T08:37:28.979Z"
+    }
+}
+]

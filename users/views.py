@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema_view, extend_schema
+from drf_spectacular.utils import extend_schema
 from users.permissions import IsUserSelf
 from rest_framework.filters import OrderingFilter
 from rest_framework import generics
