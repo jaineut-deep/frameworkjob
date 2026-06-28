@@ -26,6 +26,8 @@ dependencies = [
     "django-celery-beat (>=2.9.0,<3.0.0)"
 ]
 
+[tool.poetry]
+packages = [{include = "config", from = "."}]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
