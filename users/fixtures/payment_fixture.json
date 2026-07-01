@@ -1,0 +1,16 @@
+[
+{
+    "model": "users.payment",
+    "pk": 1,
+    "fields": {
+        "user": 5,
+        "payment_date": "2026-06-11",
+        "course": 3,
+        "lesson": null,
+        "total_amount": "1263.89",
+        "payment_method": true,
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a17FayGfE9tTqkB1zIYCgjHRx0ldjvDdgFpX2RoA3XzIKxnNPMvRYNCiAm#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRRYm9sYU9gZGNMRGxKd2EzTDBrdm9mVTFXYFVqSFczVEldR2JiVEE8TDBMa2N1NFMwSVxCSjxQbnJ3Vnw2QEhJRDRkMjVmU0lyTjUyPVw3ZkZoZjB3b3E1NUB1XGBgcUMyJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "payment_status": "unpaid"
+    }
+}
+]

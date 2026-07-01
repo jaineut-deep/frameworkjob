@@ -1,0 +1,110 @@
+[
+{
+    "model": "syllabus.lesson",
+    "pk": 2,
+    "fields": {
+        "title": "Основы программирования на Python",
+        "description": "Типы данных. Переменные. Функция",
+        "image": "",
+        "link": null,
+        "course": 3,
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 3,
+    "fields": {
+        "title": "Базы данных и Flask",
+        "description": "Настройка БД. Работа с таблицами. Работа в приложении",
+        "image": "",
+        "link": null,
+        "course": 3,
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 4,
+    "fields": {
+        "title": "Бэкенд на Django",
+        "description": "Работа с шаблонами. Django ORM, модели и БД",
+        "image": "",
+        "link": null,
+        "course": 3,
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 5,
+    "fields": {
+        "title": "Основы С++ с Qt",
+        "description": "Qt language. Контейнеры и QString. Механизм сигналов и слотов",
+        "image": "",
+        "link": null,
+        "course": 4,
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 6,
+    "fields": {
+        "title": "Производительность и оптимизация в C++",
+        "description": "Методы оптимизации кода. Профилирование и анализ производительности",
+        "image": "",
+        "link": null,
+        "course": 4,
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 7,
+    "fields": {
+        "title": "Качество кода в C++",
+        "description": "Clang Static Analyzer. Тестирования",
+        "image": "",
+        "link": null,
+        "course": 4,
+        "owner": 4
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 8,
+    "fields": {
+        "title": "Java Core: введение",
+        "description": "Что такое Java. Установка JDK. JShell",
+        "image": "",
+        "link": null,
+        "course": 5,
+        "owner": 5
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 9,
+    "fields": {
+        "title": "Основы программирования на Java",
+        "description": "Структура программы. Преобразования базовых типов данных",
+        "image": "",
+        "link": null,
+        "course": 5,
+        "owner": 5
+    }
+},
+{
+    "model": "syllabus.lesson",
+    "pk": 10,
+    "fields": {
+        "title": "Spring Boot и работа с БД",
+        "description": "Maven. REST и Spring Boot. Внедрение зависимостей. Введение в базы данных",
+        "image": "",
+        "link": null,
+        "course": 5,
+        "owner": 5
+    }
+}
+]
