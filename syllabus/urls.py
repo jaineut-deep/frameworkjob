@@ -11,7 +11,7 @@ router = DefaultRouter()
 router.register(r"courses", CourseViewSet, basename="courses")
 
 
-def health_check(request):
+def health_check():
     return HttpResponse("OK")
 
 urlpatterns = [
