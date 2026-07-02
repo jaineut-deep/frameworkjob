@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -29,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -41,17 +42,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "syllabus",
     "users",
-
     "django_filters",
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
     "corsheaders",
-    "django_celery_beat"
-
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -63,7 +61,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -136,9 +133,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
@@ -163,39 +158,36 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CACHE_ENABLED = True if os.getenv("CACHE_ENABLED") == "True" else False
 if CACHE_ENABLED:
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
-                        f'{os.getenv("REDIS_DB", "1")}',
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
+            f'{os.getenv("REDIS_DB", "1")}',
         }
     }
 
 # rest_framework settings
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'API Documentation',
-    'DESCRIPTION': 'Description',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "API Documentation",
+    "DESCRIPTION": "Description",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 CORS_ALLOWED_ORIGINS = [
@@ -210,12 +202,16 @@ CSRF_TRUSTED_ORIGINS = [
 # Настройки для Celery
 
 # URL-адрес брокера сообщений
-CELERY_BROKER_URL = (f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
-                     f'{os.getenv("REDIS_DB", "0")}')
+CELERY_BROKER_URL = (
+    f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
+    f'{os.getenv("REDIS_DB", "0")}'
+)
 
 # URL-адрес брокера результатов
-CELERY_RESULT_BACKEND = (f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
-                         f'{os.getenv("REDIS_DB", "0")}')
+CELERY_RESULT_BACKEND = (
+    f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
+    f'{os.getenv("REDIS_DB", "0")}'
+)
 
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = "UTC"
@@ -227,9 +223,9 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BEAT_SCHEDULE = {
-    'task-name': {
-        'task': 'users.tasks.block_user_after_month',
-        'schedule': timedelta(minutes=2),
+    "task-name": {
+        "task": "users.tasks.block_user_after_month",
+        "schedule": timedelta(minutes=2),
     },
 }
 

@@ -20,5 +20,5 @@ def send_update_course_mail(pk, model, hours):
             subject="Новости с образовательной платформы",
             message=f"Курс {course}, на который вы подписаны, обновился",
             from_email=EMAIL_HOST_USER,
-            recipient_list=users_emails
+            recipient_list=users_emails,
         )

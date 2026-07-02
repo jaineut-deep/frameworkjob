@@ -8,10 +8,12 @@ class CourseLessonPaginator(PageNumberPagination):
     max_page_size = 10
 
     def get_paginated_response(self, data):
-        return Response({
-            'count': self.page.paginator.count,
-            'next': self.get_next_link(),
-            'previous': self.get_previous_link(),
-            'page_size': self.get_page_size(self.request),
-            'results': data
-        })
+        return Response(
+            {
+                "count": self.page.paginator.count,
+                "next": self.get_next_link(),
+                "previous": self.get_previous_link(),
+                "page_size": self.get_page_size(self.request),
+                "results": data,
+            }
+        )

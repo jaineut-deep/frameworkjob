@@ -13,10 +13,7 @@ def get_prod_id(title, description):
     load_dotenv()
     url = os.getenv("PRODUCTS_URL")
     headers = {"Authorization": f"Bearer {os.getenv('STRIPE_SECRET_KEY')}"}
-    data = {
-        "name": title,
-        "description": description
-    }
+    data = {"name": title, "description": description}
     try:
         response = requests.post(url, headers=headers, data=data)
         response.raise_for_status()
@@ -29,6 +26,7 @@ def get_prod_id(title, description):
     if response.status_code == status.HTTP_200_OK:
         data_response = response.json()
         return data_response.get("id")
+
 
 def get_price_id(product_id, amount):
     """
@@ -56,6 +54,7 @@ def get_price_id(product_id, amount):
         data_response = response.json()
         return data_response.get("id")
 
+
 def get_session(price_id):
     """
     Функция принимает id цены данного продукта, а возвращает объект текущей платежной сессии в виде словаря.
@@ -65,11 +64,11 @@ def get_session(price_id):
     url = os.getenv("SESSIONS_URL")
     headers = {"Authorization": f"Bearer {os.getenv("STRIPE_SECRET_KEY")}"}
     line_items = [
-            {
-                "price": price_id,
-                "quantity": 1,
-            },
-        ]
+        {
+            "price": price_id,
+            "quantity": 1,
+        },
+    ]
     data = {
         "success_url": "https://localhost:8080/",
         "line_items[0][price]": line_items[0]["price"],

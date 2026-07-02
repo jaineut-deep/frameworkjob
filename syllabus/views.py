@@ -12,10 +12,11 @@ from syllabus.models import Course, Lesson, Subscription
 from syllabus.tasks import send_update_course_mail
 from users.permissions import IsNotModerator, IsOwner
 
+
 @extend_schema_view(
     list=extend_schema(
         summary="Получить список курсов",
-        ),
+    ),
     update=extend_schema(
         summary="Изменение существующего объекта курса",
     ),
@@ -24,10 +25,10 @@ from users.permissions import IsNotModerator, IsOwner
     ),
     create=extend_schema(
         summary="Создание нового курса",
-        ),
+    ),
     destroy=extend_schema(
         summary="Удаление существующего курса",
-        ),
+    ),
 )
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
@@ -52,9 +53,13 @@ class CourseViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         if request.user.groups.filter(name="Moderators").exists():
             queryset = self.get_queryset()
-        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(owner=self.request.user):
+        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(
+            owner=self.request.user
+        ):
             queryset = self.get_queryset().filter(owner=self.request.user)
-        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(subscriptions__user=self.request.user):
+        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(
+            subscriptions__user=self.request.user
+        ):
             queryset = self.get_queryset().filter(subscriptions__user=self.request.user)
         else:
             raise PermissionDenied("Недостаточно прав для отображения объектов.")
@@ -82,8 +87,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         if request.user.groups.filter(name="Moderators").exists():
             serializer.save()
             send_update_course_mail.delay(instance.id, "Course", differ_time_hours)
-        elif (not request.user.groups.filter(name="Moderators").exists() and
-            self.get_queryset().filter(owner=request.user)):
+        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(
+            owner=request.user
+        ):
             serializer.save(owner=request.user)
             send_update_course_mail.delay(instance.id, "Course", differ_time_hours)
         else:
@@ -148,8 +154,9 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
         if request.user.groups.filter(name="Moderators").exists():
             serializer.save()
             send_update_course_mail.delay(instance.id, "Lesson", differ_time_hours)
-        elif (not request.user.groups.filter(name="Moderators").exists() and
-            self.get_queryset().filter(owner=request.user)):
+        elif not request.user.groups.filter(name="Moderators").exists() and self.get_queryset().filter(
+            owner=request.user
+        ):
             serializer.save(owner=request.user)
             send_update_course_mail.delay(instance.id, "Lesson", differ_time_hours)
         else:
@@ -169,10 +176,7 @@ class SubscriptionView(APIView):
         course_id = request.data.get("course_id")
 
         if not course_id:
-            return Response(
-                {"error": "course_id is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "course_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         course_item = get_object_or_404(Course, id=course_id)
         subs_item = Subscription.objects.filter(user=user, course=course_item)

@@ -11,21 +11,27 @@ class LessonTestCase(TestCase):
 
     def setUp(self):
         self.user = CustomUser.objects.create_user(username="user_test", email="test@example.com", password="qwerty")
-        self.user_owner = CustomUser.objects.create_user(username="owner_user", email="owner@example.com",
-                                                         password="123qwe")
-        self.user_moder = CustomUser.objects.create_user(username="moder_user", email="moder@example.com",
-                                                         password="qwe123")
+        self.user_owner = CustomUser.objects.create_user(
+            username="owner_user", email="owner@example.com", password="123qwe"
+        )
+        self.user_moder = CustomUser.objects.create_user(
+            username="moder_user", email="moder@example.com", password="qwe123"
+        )
         self.user_moder.groups.add(1)
 
         self.course = Course.objects.create(title="Test_course", description="Test_description", owner=self.user_owner)
-        self.course_alter = Course.objects.create(title="Test_course_different",
-                                                  description="Test_description_different", owner=self.user_owner)
-        self.lessons_one = Lesson.objects.create(title="Test_lesson_one", description="Test_practices",
-                                                 course=self.course, owner=self.user_owner)
-        self.lessons_two = Lesson.objects.create(title="Test_lesson_two", description="Test_theory", course=self.course,
-                                                 owner=self.user_owner)
-        self.lessons_three = Lesson.objects.create(title="Test_lesson_three", description="Test_theory_three", course=self.course,
-                                                 owner=self.user_owner)
+        self.course_alter = Course.objects.create(
+            title="Test_course_different", description="Test_description_different", owner=self.user_owner
+        )
+        self.lessons_one = Lesson.objects.create(
+            title="Test_lesson_one", description="Test_practices", course=self.course, owner=self.user_owner
+        )
+        self.lessons_two = Lesson.objects.create(
+            title="Test_lesson_two", description="Test_theory", course=self.course, owner=self.user_owner
+        )
+        self.lessons_three = Lesson.objects.create(
+            title="Test_lesson_three", description="Test_theory_three", course=self.course, owner=self.user_owner
+        )
 
         self.client = APIClient()
 
@@ -36,17 +42,17 @@ class LessonTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertIn('count', response.data)
-        self.assertIn('next', response.data)
-        self.assertIn('previous', response.data)
-        self.assertIn('results', response.data)
+        self.assertIn("count", response.data)
+        self.assertIn("next", response.data)
+        self.assertIn("previous", response.data)
+        self.assertIn("results", response.data)
 
         lessons_data = Lesson.objects.filter(owner=self.user_owner)
         serialized_lessons = LessonSerializer(lessons_data, many=True)
 
-        page_size = response.data.get('page_size', 2)
+        page_size = response.data.get("page_size", 2)
         expected_count = min(len(serialized_lessons.data), page_size)
-        self.assertEqual(len(response.data['results']), expected_count)
+        self.assertEqual(len(response.data["results"]), expected_count)
 
     def test_lesson_create_moder(self):
         self.client.force_authenticate(user=self.user_moder)
@@ -59,8 +65,12 @@ class LessonTestCase(TestCase):
     def test_lesson_create_owner(self):
         self.client.force_authenticate(user=self.user_owner)
         url = reverse("syllabus:lesson_create")
-        data = {"title": "Test_title", "description": "Test_description", "course": self.course.id,
-                "owner": self.user_owner.id}
+        data = {
+            "title": "Test_title",
+            "description": "Test_description",
+            "course": self.course.id,
+            "owner": self.user_owner.id,
+        }
         response = self.client.post(url, data)
         lesson_data = Lesson.objects.get(title="Test_title", description="Test_description")
         serialized_lesson = LessonSerializer(lesson_data)
@@ -114,7 +124,7 @@ class LessonTestCase(TestCase):
         url = reverse("syllabus:lesson_delete", args=(self.lessons_two.pk,))
         response = self.client.delete(url)
         data_output = response.json()
-        warn_mess = {'detail': 'You do not have permission to perform this action.'}
+        warn_mess = {"detail": "You do not have permission to perform this action."}
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(data_output, warn_mess)
@@ -130,8 +140,13 @@ class LessonTestCase(TestCase):
     def test_lesson_create_wrong(self):
         self.client.force_authenticate(user=self.user_owner)
         url = reverse("syllabus:lesson_create")
-        data = {"title": "Test_title", "description": "Test_description", "link": "https://www.rutube.ru",
-                "course": self.course.id, "owner": self.user_owner.id}
+        data = {
+            "title": "Test_title",
+            "description": "Test_description",
+            "link": "https://www.rutube.ru",
+            "course": self.course.id,
+            "owner": self.user_owner.id,
+        }
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
