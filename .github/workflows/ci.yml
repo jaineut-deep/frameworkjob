@@ -76,7 +76,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: test
 
     steps:
     - name: Set up SSH
@@ -92,9 +92,9 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry install --no-interaction --no-ansi
         EOF
 
     - name: Apply migrations on server
