@@ -87,13 +87,24 @@ jobs:
     - name: Copy project files to server
       run: |
         rsync -avz --exclude '__pycache__' . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
-        rsync -avz .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+
+    - name: Upload .env to server (from environment secrets)
+      env:
+        ENV_FILE: ${{ secrets.ENV_FILE }}
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd ${{ secrets.DEPLOY_DIR }}
+          cat > .env <<'ENV'
+          ${ENV_FILE}
+          ENV
+          chmod 600 .env
+        EOF
 
     - name: Install dependencies on server
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
-          curl -sSL https://install.python-poetry.org | python3 -
+          sudo curl -sSL https://install.python-poetry.org | python3 -
           export PATH="$HOME/.local/bin:$PATH"
           poetry install --no-interaction --no-ansi
         EOF
@@ -106,16 +117,9 @@ jobs:
           python3 manage.py migrate
         EOF
 
-    - name: Collect static files on server
+    - name: Start application
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
-          source venv/bin/activate
-          python manage.py collectstatic --noinput
-        EOF
-
-    - name: Restart application
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          sudo systemctl restart myapp.service
+          sudo docker compose build --no-cache
+          sudo docker compose up -d
         EOF
