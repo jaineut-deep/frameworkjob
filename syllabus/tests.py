@@ -1,10 +1,13 @@
-from unittest import TestCase
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from syllabus.serializers import LessonSerializer
 from users.models import CustomUser
 from syllabus.models import Course, Lesson, Subscription
+from rest_framework.response import Response as DRFResponse
+from django.contrib.auth.models import Group
+from unittest.mock import patch
 
 
 class LessonTestCase(TestCase):
@@ -17,7 +20,8 @@ class LessonTestCase(TestCase):
         self.user_moder = CustomUser.objects.create_user(
             username="moder_user", email="moder@example.com", password="qwe123"
         )
-        self.user_moder.groups.add(1)
+        moder_group, _ = Group.objects.get_or_create(name="Moderators")
+        self.user_moder.groups.add(moder_group)
 
         self.course = Course.objects.create(title="Test_course", description="Test_description", owner=self.user_owner)
         self.course_alter = Course.objects.create(
@@ -33,12 +37,12 @@ class LessonTestCase(TestCase):
             title="Test_lesson_three", description="Test_theory_three", course=self.course, owner=self.user_owner
         )
 
-        self.client = APIClient()
+        self.client: APIClient = APIClient()
 
     def test_lesson_list_owner(self):
         self.client.force_authenticate(user=self.user_owner)
         url = reverse("syllabus:lesson_list")
-        response = self.client.get(url, {"page": 1})
+        response: DRFResponse = self.client.get(url, {"page": 1})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -57,7 +61,7 @@ class LessonTestCase(TestCase):
     def test_lesson_create_moder(self):
         self.client.force_authenticate(user=self.user_moder)
         url = reverse("syllabus:lesson_create")
-        data = {"title": "Test_title", "description": "Test_description"}
+        data = {"title": "Test_title", "description": "Test_description", "course": 1}
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -111,7 +115,10 @@ class LessonTestCase(TestCase):
         self.client.force_authenticate(user=self.user_moder)
         url = reverse("syllabus:lesson_update", args=(self.lessons_one.pk,))
         data = {"description": "Test_alter_description", "course": self.course.id, "owner": self.user_owner.id}
-        response = self.client.patch(url, data)
+        with patch("syllabus.views.send_update_course_mail.delay") as mock_delay:
+            response = self.client.patch(url, data)
+        mock_delay.assert_called_once()
+
         data_output = response.json()
         self.lessons_one.refresh_from_db()
         serialized_lesson = LessonSerializer(self.lessons_one)
@@ -132,7 +139,9 @@ class LessonTestCase(TestCase):
     def test_lesson_destroy_owner(self):
         self.client.force_authenticate(user=self.user_owner)
         url = reverse("syllabus:lesson_delete", args=(self.lessons_two.pk,))
-        response = self.client.delete(url)
+        with patch("syllabus.views.send_update_course_mail.delay") as mock_delay:
+            response = self.client.delete(url)
+        mock_delay.assert_not_called()
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Lesson.objects.filter(owner=self.user_owner).count(), 2)
