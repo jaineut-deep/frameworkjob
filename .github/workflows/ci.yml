@@ -49,6 +49,12 @@ jobs:
     services:
       db:
         image: postgres:15-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: mydb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
 
     steps:
     - name: Check out code
@@ -76,11 +82,11 @@ jobs:
       run: poetry install
 
     - name: Debug DB env
+      env:
+        POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
       run: |
         echo "POSTGRES_HOST=$POSTGRES_HOST"
-        echo "POSTGRES_PORT=$POSTGRES_PORT"
-        echo "POSTGRES_DB=$POSTGRES_DB"
-        echo "POSTGRES_USER=$POSTGRES_USER"
+        getent hosts "$POSTGRES_HOST" || nslookup "$POSTGRES_HOST" || true
 
     - name: Run migrations
       env:
@@ -92,6 +98,12 @@ jobs:
       run: poetry run python3 manage.py migrate
 
     - name: Run tests
+      env:
+        POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
+        POSTGRES_PORT: ${{ env.POSTGRES_PORT }}
+        POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        POSTGRES_USER: ${{ env.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
       run: poetry run python3 manage.py test
 
   deploy:
