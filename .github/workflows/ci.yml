@@ -41,6 +41,7 @@ jobs:
       DEBUG: "True"
       REDIS_HOST: "127.0.0.1"
       REDIS_PORT: "6379"
+      REDIS_DB: "1"
       SECRET_KEY: empty
       POSTGRES_DB: mybase
       POSTGRES_USER: postgres
@@ -57,6 +58,15 @@ jobs:
           POSTGRES_DB: mybase
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        env:
+          REDIS_HOST: "127.0.0.1"
+          REDIS_PORT: "6379"
+          REDIS_DB: "1"
 
     steps:
     - name: Check out code
@@ -96,6 +106,7 @@ jobs:
       env:
         REDIS_HOST: ${{ env.REDIS_HOST }}
         REDIS_PORT: ${{ env.REDIS_PORT }}
+        REDIS_DB: ${{ env.REDIS_DB }}
         POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
         POSTGRES_PORT: ${{ env.POSTGRES_PORT }}
         POSTGRES_DB: ${{ env.POSTGRES_DB }}
