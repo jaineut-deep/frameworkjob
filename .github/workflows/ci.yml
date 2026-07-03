@@ -39,6 +39,7 @@ jobs:
     needs: lint
     env:
       DEBUG: "True"
+      REDIS_HOST: "127.0.0.1"
       SECRET_KEY: empty
       POSTGRES_DB: mybase
       POSTGRES_USER: postgres
@@ -81,13 +82,6 @@ jobs:
     - name: Install dependencies
       run: poetry install
 
-    - name: Debug DB env
-      env:
-        POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
-      run: |
-        echo "POSTGRES_HOST=$POSTGRES_HOST"
-        getent hosts "$POSTGRES_HOST" || nslookup "$POSTGRES_HOST" || true
-
     - name: Run migrations
       env:
         POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
@@ -99,6 +93,7 @@ jobs:
 
     - name: Run tests
       env:
+        REDIS_HOST: ${{ env.REDIS_HOST }}
         POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
         POSTGRES_PORT: ${{ env.POSTGRES_PORT }}
         POSTGRES_DB: ${{ env.POSTGRES_DB }}
