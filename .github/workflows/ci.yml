@@ -124,9 +124,16 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
+    - name: Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts
+
     - name: Copy project files to server
       run: |
-        rsync -avz --exclude '__pycache__' . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+        rsync -avz --exclude '__pycache__' \
+        -e "ssh -p ${{ secrets.SSH_PORT }}" \
+        . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
 
     - name: Upload .env to server (from environment secrets)
       env:
