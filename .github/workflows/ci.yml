@@ -43,7 +43,7 @@ jobs:
       POSTGRES_DB: mybase
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST: db
+      POSTGRES_HOST: "127.0.0.1"
       POSTGRES_PORT: "5432"
 
     services:
@@ -52,7 +52,7 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: mydb
+          POSTGRES_DB: mybase
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
 
