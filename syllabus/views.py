@@ -167,6 +167,15 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated, IsNotModerator, IsOwner]
 
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        lesson = Lesson.objects.get(id=instance.id)
+        differ_time = timezone.now() - instance.updated_at
+        differ_time_hours = round((differ_time.total_seconds() / 3600), 2)
+        lesson.delete()
+        send_update_course_mail.delay(instance.id, "Lesson", differ_time_hours)
+        return Response("Successfully removed", status=status.HTTP_204_NO_CONTENT)
+
 
 class SubscriptionView(APIView):
 

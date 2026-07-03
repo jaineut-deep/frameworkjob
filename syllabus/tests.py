@@ -141,7 +141,7 @@ class LessonTestCase(TestCase):
         url = reverse("syllabus:lesson_delete", args=(self.lessons_two.pk,))
         with patch("syllabus.views.send_update_course_mail.delay") as mock_delay:
             response = self.client.delete(url)
-        mock_delay.assert_not_called()
+        mock_delay.assert_called_once()
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Lesson.objects.filter(owner=self.user_owner).count(), 2)
