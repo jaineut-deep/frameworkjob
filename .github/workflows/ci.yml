@@ -131,7 +131,7 @@ jobs:
 
     - name: Copy project files to server
       run: |
-        rsync -avz --exclude '__pycache__' \
+        sudo rsync -o -g -avz --exclude '__pycache__' \
         -e "ssh -p ${{ secrets.SSH_PORT }}" \
         . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
 
