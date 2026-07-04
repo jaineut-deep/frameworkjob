@@ -126,17 +126,35 @@ jobs:
 
     - name: Add server to known hosts
       env:
-        SERV_HOST: ${{ secret.SERVER_IP }}
-      run: ssh-keyscan -H "$SERV_HOST" >> ~/.ssh/known_hosts
+        SERV_HOST: ${{ secrets.SERVER_IP }}
+      run: |
+        chmod 700 ~/.ssh
+        ssh-keyscan -H "$SERV_HOST" >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
+    - name: Create .env locally
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
+        chmod 600 .env
+
+    - name: Transfer .env to server via rsync
+      env:
+        SERV_HOST: ${{ secrets.SERVER_IP }}
+        SERV_USER: ${{ secrets.SSH_USER }}
+        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
+      run: |
+        rsync -avz -e "ssh -o StrictHostKeyChecking=yes" \
+          .env "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
+        ssh "${SERV_USER}@${SERV_HOST}" "chmod 600 ${SERV_PATH}/.env"
 
     - name: Copy project files to server
       env:
-        SERV_HOST: ${{ secret.SERVER_IP }}
-        SERV_USER: ${{ secret.SSH_USER }}
-        SERV_PATH: ${{ secret.DEPLOY_DIR }}
-        SERV_PORT: ${{ secret.SSH_PORT }}
+        SERV_HOST: ${{ secrets.SERVER_IP }}
+        SERV_USER: ${{ secrets.SSH_USER }}
+        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
+        SERV_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        sudo rsync -o -g -avz \
+        rsync -avz \
         --exclude '__pycache__' \
         --exclude '.git' \
         --exclude '.github' \
@@ -145,30 +163,23 @@ jobs:
         -e "ssh -p ${SERV_PORT}" \
         ./"${SERV_USER}@${SERV_HOST}:${SERV_PATH}/"
 
-    - name: Upload .env to server (from environment secrets)
-      env:
-        ENV_FILE: ${{ secrets.ENV_FILE }}
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
-          cat > .env <<'ENV'
-          ${ENV_FILE}
-          ENV
-          chmod 600 .env
-        EOF
-
     - name: Install dependencies on server
+      env:
+        SERV_HOST: ${{ secrets.SERVER_IP }}
+        SERV_USER: ${{ secrets.SSH_USER }}
+        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
+        ssh -o StrictHostKeyChecking=yes ${SERV_USER}@${SERV_HOST} << 'EOF'
+          cd ${SERV_PATH}
           sudo curl -sSL https://install.python-poetry.org | python3 -
           export PATH="$HOME/.local/bin:$PATH"
           poetry install --no-interaction --no-ansi
         EOF
 
     - name: Apply migrations on server
+
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=yes ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
           source venv/bin/activate
           python3 manage.py migrate
@@ -176,7 +187,7 @@ jobs:
 
     - name: Start application
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=yes ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           sudo docker compose build --no-cache
           sudo docker compose up -d
         EOF
