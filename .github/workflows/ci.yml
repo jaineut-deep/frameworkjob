@@ -143,7 +143,7 @@ jobs:
         SERV_USER: ${{ secrets.SSH_USER }}
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
-        rsync -avz -e "ssh -o StrictHostKeyChecking=yes" \
+        sudo rsync -avz -e "ssh -o StrictHostKeyChecking=yes" \
           .env "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
         ssh "${SERV_USER}@${SERV_HOST}" "chmod 600 ${SERV_PATH}/.env"
 
@@ -154,7 +154,7 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
         SERV_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        rsync -avz \
+        sudo rsync -avz \
         --exclude '__pycache__' \
         --exclude '.git' \
         --exclude '.github' \
