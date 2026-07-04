@@ -140,7 +140,6 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
         chmod 600 .env
-        chown 1000:1000 .env
 
     - name: Transfer .env to server via rsync
       env:
