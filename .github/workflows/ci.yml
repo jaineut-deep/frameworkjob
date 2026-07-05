@@ -141,7 +141,7 @@ jobs:
         ENV_DATA: ${{ secrets.ENV_FILE }}
       run: |
         python3 - << 'PY'
-        impost os
+        import os
         s = os.environ["ENV_DATA"]
         s = s.replace("\\n", "\n")
         with open(".env", "w", encoding="utf-8") as f:
