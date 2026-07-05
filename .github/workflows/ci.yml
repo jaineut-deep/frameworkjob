@@ -136,9 +136,12 @@ jobs:
         ssh-keyscan -H "$SERV_HOST" >> ~/.ssh/known_hosts
         chmod 644 ~/.ssh/known_hosts
 
-    - name: Create .env locally
+    - name: Transfer .env to server via rsync
       env:
         ENV_DATA: ${{ secrets.ENV_FILE }}
+        SERV_HOST: ${{ secrets.SERVER_IP }}
+        SERV_USER: ${{ secrets.SSH_USER }}
+        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
         python3 - << 'PY'
         import os
@@ -148,13 +151,6 @@ jobs:
             f.write(s)
         PY
         chmod 600 .env
-
-    - name: Transfer .env to server via rsync
-      env:
-        SERV_HOST: ${{ secrets.SERVER_IP }}
-        SERV_USER: ${{ secrets.SSH_USER }}
-        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
-      run: |
         rsync -avz -e "ssh -o StrictHostKeyChecking=yes" \
           .env "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
         ssh "${SERV_USER}@${SERV_HOST}" "chmod 600 ${SERV_PATH}/.env"
