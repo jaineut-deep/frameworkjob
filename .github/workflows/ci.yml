@@ -140,9 +140,7 @@ jobs:
       env:
         ENV_DATA: ${{ secrets.ENV_FILE }}
       run: |
-        cat > .env << 'EOF'
-        ${ENV_DATA}
-        EOF
+        printf '%b' "${ENV_DATA}" > .env
         chmod 600 .env
 
     - name: Transfer .env to server via rsync
