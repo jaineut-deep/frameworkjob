@@ -136,24 +136,32 @@ jobs:
         ssh-keyscan -H "$SERV_HOST" >> ~/.ssh/known_hosts
         chmod 644 ~/.ssh/known_hosts
 
-    - name: Transfer .env to server via rsync
+    - name: Create .env on runner
       env:
         ENV_DATA: ${{ secrets.ENV_FILE }}
         SERV_HOST: ${{ secrets.SERVER_IP }}
         SERV_USER: ${{ secrets.SSH_USER }}
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
+        set -euo pipefail
         python3 - << 'PY'
         import os
         s = os.environ["ENV_DATA"]
         s = s.replace("\\n", "\n")
-        with open(".env", "w", encoding="utf-8") as f:
+        with open("env.tmp", "w", encoding="utf-8", newline="\n") as f:
             f.write(s)
         PY
-        chmod 600 .env
+        chmod 600 env.tmp
+
+    - name: Upload .env via rsync
+      env:
+        SERV_HOST: ${{ secrets.SERVER_IP }}
+        SERV_USER: ${{ secrets.SSH_USER }}
+        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
+      run: |
+        set -euo pipefail
         rsync -avz -e "ssh -o StrictHostKeyChecking=yes" \
-          .env "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
-        ssh "${SERV_USER}@${SERV_HOST}" "chmod 600 ${SERV_PATH}/.env"
+          --chmod=600 env.tmp "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
 
     - name: Copy project files to server
       env:
