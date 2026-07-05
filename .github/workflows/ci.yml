@@ -140,7 +140,13 @@ jobs:
       env:
         ENV_DATA: ${{ secrets.ENV_FILE }}
       run: |
-        printf '%b' "${ENV_DATA}" > .env
+        python3 - << 'PY'
+        impost os
+        s = os.environ["ENV_DATA"]
+        s = s.replace("\\n", "\n")
+        with open(".env", "w", encoding="utf-8") as f:
+            f.write(s)
+        PY
         chmod 600 .env
 
     - name: Transfer .env to server via rsync
@@ -176,8 +182,9 @@ jobs:
       env:
         SERV_HOST: ${{ secrets.SERVER_IP }}
         SERV_USER: ${{ secrets.SSH_USER }}
+        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
-        ssh -o StrictHostKeyChecking=yes ${SERV_USER}@${SERV_HOST} << 'EOF'
+        ssh -o StrictHostKeyChecking=yes ${SERV_USER}@${SERV_HOST}:${SERV_PATH} << 'EOF'
           sudo docker compose build --no-cache
           sudo docker compose up -d
         EOF
