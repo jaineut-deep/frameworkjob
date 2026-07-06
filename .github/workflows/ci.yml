@@ -144,13 +144,7 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
         set -euo pipefail
-        python3 - << 'PY'
-        import os
-        s = os.environ["ENV_DATA"]
-        s = s.replace("\\n", "\n")
-        with open("env.tmp", "w", encoding="utf-8", newline="\n") as f:
-            f.write(s)
-        PY
+        echo "${ENV_DATA}" | base64 -d > env.tmp
         chmod 600 env.tmp
 
     - name: Upload .env via rsync
@@ -160,8 +154,8 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
         set -euo pipefail
-        rsync -avz -e "ssh -o StrictHostKeyChecking=yes" \
-          --chmod=600 env.tmp "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
+        rsync -avz --chmod=600 -e "ssh -o StrictHostKeyChecking=yes" \
+          env.tmp "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
 
     - name: Copy project files to server
       env:
@@ -180,7 +174,7 @@ jobs:
         --exclude '.env.example' \
         --exclude 'htmlcov/' \
         -e "ssh -p ${SERV_PORT}" \
-        . "${SERV_USER}@${SERV_HOST}:${SERV_PATH}"
+        ./ "${SERV_USER}@${SERV_HOST}:${SERV_PATH}"
 
     - name: Start application
       env:
