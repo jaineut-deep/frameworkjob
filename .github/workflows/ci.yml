@@ -144,7 +144,7 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
         set -euo pipefail
-        echo "${ENV_DATA}" | base64 -d > env.tmp
+        base64 -d < "${ENV_DATA}" > env.tmp
         chmod 600 env.tmp
 
     - name: Upload .env via rsync
@@ -164,7 +164,7 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
         SERV_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        rsync -avz \
+        rsync -avz "ssh -o StrictHostKeyChecking=yes" \
         --exclude '__pycache__' \
         --exclude '.git' \
         --exclude '.github' \
