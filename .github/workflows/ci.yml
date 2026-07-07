@@ -144,7 +144,7 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
         set -euo pipefail
-        base64 -d < "${ENV_DATA}" > env.tmp
+        printf '%s' "${ENV_DATA}" | base64 -d > env.tmp
         chmod 600 env.tmp
 
     - name: Upload .env via rsync
