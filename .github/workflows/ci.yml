@@ -137,9 +137,11 @@ jobs:
         chmod 644 ~/.ssh/known_hosts
 
     - name: Create .env on runner
+      env:
+        ENV_DATA: ${{ secrets.ENV_FILE }}
       run: |
         set -euo pipefail
-        base64 -d "${{ secrets.ENV_FILE }}" > .env
+        echo '$ENV_DATA' | base64 -d > .env
 
     - name: Copy project files to server
       env:
