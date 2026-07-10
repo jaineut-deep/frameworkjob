@@ -141,7 +141,7 @@ jobs:
         ENV_DATA: ${{ secrets.ENV_FILE }}
       run: |
         set -euo pipefail
-        echo '$ENV_DATA' | base64 -d > .env
+        printf '%s' '$ENV_DATA' | base64 -d > .env
 
     - name: Copy project files to server
       env:
@@ -158,7 +158,7 @@ jobs:
         --exclude 'node_modules' \
         --exclude '.gitignore' \
         --exclude '.env.example' \
-        --exclude 'htmlcov/' \
+        --exclude 'htmlcov' \
         -e "ssh -p ${SERV_PORT}" \
         ./ "${SERV_USER}@${SERV_HOST}:${SERV_PATH}"
 
