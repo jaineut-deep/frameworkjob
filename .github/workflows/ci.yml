@@ -137,25 +137,9 @@ jobs:
         chmod 644 ~/.ssh/known_hosts
 
     - name: Create .env on runner
-      env:
-        ENV_DATA: ${{ secrets.ENV_FILE }}
-        SERV_HOST: ${{ secrets.SERVER_IP }}
-        SERV_USER: ${{ secrets.SSH_USER }}
-        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
         set -euo pipefail
-        printf '%s' "${ENV_DATA}" | base64 -d > env.tmp
-        chmod 600 env.tmp
-
-    - name: Upload .env via rsync
-      env:
-        SERV_HOST: ${{ secrets.SERVER_IP }}
-        SERV_USER: ${{ secrets.SSH_USER }}
-        SERV_PATH: ${{ secrets.DEPLOY_DIR }}
-      run: |
-        set -euo pipefail
-        rsync -avz --chmod=600 -e "ssh -o StrictHostKeyChecking=yes" \
-          env.tmp "${SERV_USER}@${SERV_HOST}:${SERV_PATH}/.env"
+        printf '%s' "${{ secrets.ENV_FILE }}" | base64 -d > .env
 
     - name: Copy project files to server
       env:
@@ -164,7 +148,7 @@ jobs:
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
         SERV_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        rsync -avz "ssh -o StrictHostKeyChecking=yes" \
+        rsync -avz "ssh -o StrictHostKeyChecking=no" \
         --exclude '__pycache__' \
         --exclude '.git' \
         --exclude '.github' \
