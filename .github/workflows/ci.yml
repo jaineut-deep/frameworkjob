@@ -168,7 +168,9 @@ jobs:
         SERV_USER: ${{ secrets.SSH_USER }}
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
-        ssh -o StrictHostKeyChecking=yes ${SERV_USER}@${SERV_HOST}:${SERV_PATH} << 'EOF'
+        ssh -o StrictHostKeyChecking=yes ${SERV_USER}@${SERV_HOST} << 'EOF'
+          cd ${SERV_PATH}
+          sudo docker compose down -v
           sudo docker compose build --no-cache
           sudo docker compose up -d
         EOF
