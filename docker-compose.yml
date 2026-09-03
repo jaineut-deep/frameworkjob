@@ -1,27 +1,44 @@
 services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/apps/staticfiles
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_started
+
   db:
-    image: postgres:18.4-alpine3.23
+    image: postgres:15-alpine
     container_name: postgres
     env_file:
       - ./.env
-    ports:
-      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    expose:
+      - "5432"
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
-      interval: 10s
+      interval: 20s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
   redis:
-    image: redis:8.2.7
+    image: redis:7-alpine
     container_name: redis
     volumes:
       - redis_data:/data
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -29,45 +46,59 @@ services:
       retries: 10
     restart: unless-stopped
 
-  backend:
+  migrations:
     build: .
-    container_name: backend
+    container_name: migrations
     env_file:
       - ./.env
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
-    command:
-      - "/bin/bash"
-      - "-c"
-      - |
-        python3 manage.py makemigrations &&
-        python3 manage.py migrate &&
-        python3 manage.py runserver 0.0.0.0:8000
-    ports:
-      - "8000:8000"
+    command: >
+      bash -c "
+      echo 'Waiting for database...' && \
+      until pg_isready -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB}; do
+        sleep 2
+      done && \
+      echo 'Database is ready. Running migrations...' && \
+      python3 manage.py makemigrations --no-input && \
+      python3 manage.py migrate --no-input && \
+      python3 manage.py collectstatic -c --no-input && \
+      echo 'Migrations completed!'"
     depends_on:
-      - db
-      - redis
-      - celery_beat
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - .:/apps
+      - static_volume:/apps/staticfiles
+    restart: "no"
+
+  backend:
+    build: .
+    container_name: backend
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+    expose:
+      - "8000"
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    volumes:
+      - .:/apps
+      - static_volume:/apps/staticfiles
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   celery:
     build: .
     container_name: celery
     user: celery:celery
-    command:
-      - "/bin/bash"
-      - "-c"
-      - |
-        poetry run celery -A config worker -l INFO
+    command: poetry run celery -A config worker -l INFO
     env_file:
       - ./.env
     environment:
@@ -79,8 +110,6 @@ services:
     volumes:
       - .:/apps
     restart: unless-stopped
-    expose:
-      - "8000"
 
   celery_beat:
     build: .
@@ -91,11 +120,7 @@ services:
     environment:
       POSTGRES_HOST: db
       REDIS_HOST: redis
-    command:
-      - "/bin/bash"
-      - "-c"
-      - |
-        poetry run celery -A config beat -l INFO -S django
+    command: poetry run celery -A config beat -l INFO -S django
     depends_on:
       - db
       - redis
@@ -103,9 +128,8 @@ services:
     volumes:
       - .:/apps
     restart: unless-stopped
-    expose:
-      - "8000"
 
 volumes:
   postgres_data:
   redis_data:
+  static_volume:

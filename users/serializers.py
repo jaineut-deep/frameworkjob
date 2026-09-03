@@ -5,14 +5,12 @@ from users.models import Payment, CustomUser
 
 
 @extend_schema_serializer(
-    examples = [
-         OpenApiExample(
-            'Valid example 1',
-            summary='short summary',
-            description='longer description',
-            value={
-                "course": 3
-            },
+    examples=[
+        OpenApiExample(
+            "Valid example 1",
+            summary="short summary",
+            description="longer description",
+            value={"course": 3},
         ),
     ]
 )
@@ -52,8 +50,15 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"
-        read_only_fields = ["product_id", "price_id", "session_id", "payment_status", "payment_url", "total_amount",
-                            "user"]
+        read_only_fields = [
+            "product_id",
+            "price_id",
+            "session_id",
+            "payment_status",
+            "payment_url",
+            "total_amount",
+            "user",
+        ]
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

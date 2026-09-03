@@ -15,6 +15,11 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+# Создаем директорию для статических файлов с правильными правами
+RUN mkdir -p /apps/staticfiles && \
+    chown -R celery:celery /apps/staticfiles && \
+    chmod 755 /apps/staticfiles
+
 COPY README.md /apps/README.md
 COPY pyproject.toml poetry.lock ./
 COPY . .
@@ -27,6 +32,7 @@ RUN pip install toml-to-requirements && \
 
 # Меняем владельца файлов
 RUN chown -R celery:celery /apps && \
+    find /apps -type d -name "staticfiles" -prune -o -exec chown celery:celery {} \; && \
     chmod +x manage.py
 
 USER celery

@@ -1,13 +1,21 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from syllabus.apps import SyllabusConfig
-from syllabus.views import (CourseViewSet, LessonListAPIView, LessonCreateAPIView, LessonRetrieveAPIView,
-                            LessonUpdateAPIView, LessonDestroyAPIView, SubscriptionView)
+from syllabus.views import (
+    CourseViewSet,
+    LessonListAPIView,
+    LessonCreateAPIView,
+    LessonRetrieveAPIView,
+    LessonUpdateAPIView,
+    LessonDestroyAPIView,
+    SubscriptionView,
+)
 
 app_name = SyllabusConfig.name
 
 router = DefaultRouter()
 router.register(r"courses", CourseViewSet, basename="courses")
+
 
 urlpatterns = [
     path("lesson/", LessonListAPIView.as_view(), name="lesson_list"),
