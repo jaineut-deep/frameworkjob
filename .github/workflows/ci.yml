@@ -165,11 +165,11 @@ jobs:
     - name: Start application
       env:
         SERV_HOST: ${{ secrets.SERVER_IP }}
+        SERV_PORT: ${{ secrets.SSH_PORT }}
         SERV_USER: ${{ secrets.SSH_USER }}
         SERV_PATH: ${{ secrets.DEPLOY_DIR }}
       run: |
-        ssh -t -o StrictHostKeyChecking=yes ${SERV_USER}@${SERV_HOST} \
-          "cd ${SERV_PATH} && \
-          sudo docker compose down -v && \
-          sudo docker compose build --no-cache && \
-          sudo docker compose up -d"
+        ssh -o StrictHostKeyChecking=yes \
+          -p "${SERV_PORT}" \
+          "${SERV_USER}@${SERV_HOST}" \
+          'sudo -n /usr/local/sbin/deploy-framework'
